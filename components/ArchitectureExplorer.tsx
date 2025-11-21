@@ -32,6 +32,15 @@ const ArchitectureExplorer: React.FC = () => {
     setIsPlaying(true);
   };
 
+  const handleNodeMove = (nodeId: string, x: number, y: number) => {
+    setActiveScenario((prev) => ({
+      ...prev,
+      nodes: prev.nodes.map((node) => 
+        node.id === nodeId ? { ...node, x, y } : node
+      ),
+    }));
+  };
+
   const activeNodeId = isPlaying && activeScenario.steps && simulationStep >= 0 && simulationStep < activeScenario.steps.length
     ? activeScenario.steps[simulationStep].activeNodeId
     : null;
@@ -141,7 +150,12 @@ const ArchitectureExplorer: React.FC = () => {
         
         {/* Graph Canvas - Expanded Height */}
         <div className="flex-grow min-h-[500px] bg-slate-950 rounded-xl border border-slate-800 overflow-hidden relative">
-           <GraphCanvas nodes={activeScenario.nodes} edges={activeScenario.edges} activeNodeId={activeNodeId} />
+           <GraphCanvas 
+             nodes={activeScenario.nodes} 
+             edges={activeScenario.edges} 
+             activeNodeId={activeNodeId}
+             onNodeMove={handleNodeMove}
+           />
         </div>
         
         {/* Live Log - Below Canvas */}

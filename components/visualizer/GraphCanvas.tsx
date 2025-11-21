@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { NodeData, EdgeData, NodeType } from '../../types';
 import Icon from '../ui/Icon';
@@ -7,6 +7,7 @@ interface GraphCanvasProps {
   nodes: NodeData[];
   edges: EdgeData[];
   activeNodeId?: string | null;
+  onNodeMove?: (id: string, x: number, y: number) => void;
 }
 
 const getNodeColor = (node: NodeData) => {
@@ -28,15 +29,54 @@ const getNodeColor = (node: NodeData) => {
   }
 };
 
-const GraphCanvas: React.FC<GraphCanvasProps> = ({ nodes, edges, activeNodeId }) => {
+const GraphCanvas: React.FC<GraphCanvasProps> = ({ nodes, edges, activeNodeId, onNodeMove }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [draggingId, setDraggingId] = useState<string | null>(null);
   
   // Helper to find node coordinates
   const getNode = (id: string) => nodes.find(n => n.id === id);
 
+  const handlePointerDown = (e: React.PointerEvent, nodeId: string) => {
+    if (!onNodeMove) return;
+    e.stopPropagation();
+    e.preventDefault();
+    setDraggingId(nodeId);
+    (e.target as Element).setPointerCapture(e.pointerId);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (draggingId && containerRef.current && onNodeMove) {
+      const rect = containerRef.current.getBoundingClientRect();
+      
+      // Calculate percentage based coordinates
+      let x = ((e.clientX - rect.left) / rect.width) * 100;
+      let y = ((e.clientY - rect.top) / rect.height) * 100;
+
+      // Clamp to container bounds
+      x = Math.max(0, Math.min(100, x));
+      y = Math.max(0, Math.min(100, y));
+
+      onNodeMove(draggingId, x, y);
+    }
+  };
+
+  const handlePointerUp = (e: React.PointerEvent) => {
+    if (draggingId) {
+      setDraggingId(null);
+      (e.target as Element).releasePointerCapture(e.pointerId);
+    }
+  };
+
   return (
-    <div className="relative w-full h-full min-h-[600px] bg-slate-950 rounded-xl overflow-hidden shadow-inner">
+    <div 
+      ref={containerRef}
+      className="relative w-full h-full min-h-[600px] bg-slate-950 rounded-xl overflow-hidden shadow-inner select-none"
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerLeave={handlePointerUp}
+    >
       {/* Grid Background */}
-      <div className="absolute inset-0 opacity-20" 
+      <div className="absolute inset-0 opacity-20 pointer-events-none" 
            style={{ backgroundImage: 'radial-gradient(#475569 1px, transparent 1px)', backgroundSize: '30px 30px' }}>
       </div>
 
@@ -95,19 +135,25 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ nodes, edges, activeNodeId })
       {/* Nodes */}
       {nodes.map(node => {
         const isActive = activeNodeId === node.id;
+        const isDragging = draggingId === node.id;
         return (
           <motion.div
             key={node.id}
-            className={`absolute transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-20 w-32 cursor-pointer`}
-            style={{ left: `${node.x}%`, top: `${node.y}%` }}
+            className={`absolute transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-20 w-32 ${onNodeMove ? 'cursor-grab active:cursor-grabbing' : ''}`}
+            style={{ left: `${node.x}%`, top: `${node.y}%`, touchAction: 'none' }}
             initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: isActive ? 1.2 : 1, opacity: 1, zIndex: isActive ? 50 : 20 }}
+            animate={{ 
+              scale: isActive ? 1.2 : 1, 
+              opacity: 1, 
+              zIndex: isActive || isDragging ? 50 : 20 
+            }}
+            onPointerDown={(e) => handlePointerDown(e, node.id)}
           >
             {/* Node Shape */}
             <div className={`
               w-16 h-16 flex items-center justify-center rounded-2xl border-2 shadow-2xl backdrop-blur-md transition-all duration-300
               ${getNodeColor(node)}
-              ${isActive ? 'ring-4 ring-opacity-50 scale-110' : ''}
+              ${isActive || isDragging ? 'ring-4 ring-opacity-50 scale-110' : ''}
             `}>
               <Icon name={node.icon || 'Circle'} size={32} />
             </div>
