@@ -58,125 +58,133 @@ const ArchitectureExplorer: React.FC = () => {
   const styles = getLogStyles(activeTheme);
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
-      {/* Sidebar Selection */}
-      <div className="bg-slate-900 rounded-xl border border-slate-800 p-4 space-y-4 overflow-y-auto max-h-[600px]">
-        <h2 className="text-xl font-semibold text-white mb-4">Topology Patterns</h2>
-        
+    <div className="flex flex-col h-full gap-4">
+      {/* Top Navigation / Selector */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 shrink-0">
         <button
           onClick={() => { setActiveScenario(SEQUENTIAL_SCENARIO); setIsPlaying(false); setSimulationStep(-1); }}
-          className={`w-full p-4 rounded-lg border text-left transition-all ${
+          className={`group p-3 rounded-xl border text-left transition-all hover:shadow-md flex items-center gap-3 ${
             activeScenario.id === 'sequential' 
-            ? 'bg-blue-900/20 border-blue-500 text-blue-100' 
-            : 'bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-750'
+            ? 'bg-blue-900/20 border-blue-500 text-blue-100 shadow-blue-900/20' 
+            : 'bg-slate-900 border-slate-800 text-slate-400 hover:bg-slate-800 hover:border-slate-600'
           }`}
         >
-          <div className="flex items-center justify-between mb-2">
-            <span className="font-bold">Sequential Chain</span>
-            <span className="text-xs bg-slate-900 px-2 py-1 rounded">Basic</span>
+          <div className={`p-2 rounded-lg ${activeScenario.id === 'sequential' ? 'bg-blue-500/20 text-blue-400' : 'bg-slate-800 text-slate-500 group-hover:text-slate-300'}`}>
+            <Icon name="ArrowRight" size={20} />
           </div>
-          <p className="text-sm opacity-80">Linear data flow with cumulative context. Fragile to error propagation.</p>
+          <div>
+            <div className="font-bold text-sm">Sequential Chain</div>
+            <div className="text-xs opacity-60">Basic linear flow</div>
+          </div>
         </button>
 
         <button
           onClick={() => { setActiveScenario(HIERARCHICAL_SCENARIO); setIsPlaying(false); setSimulationStep(-1); }}
-          className={`w-full p-4 rounded-lg border text-left transition-all ${
+          className={`group p-3 rounded-xl border text-left transition-all hover:shadow-md flex items-center gap-3 ${
             activeScenario.id === 'hierarchical' 
-            ? 'bg-blue-900/20 border-blue-500 text-blue-100' 
-            : 'bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-750'
+            ? 'bg-blue-900/20 border-blue-500 text-blue-100 shadow-blue-900/20' 
+            : 'bg-slate-900 border-slate-800 text-slate-400 hover:bg-slate-800 hover:border-slate-600'
           }`}
         >
-          <div className="flex items-center justify-between mb-2">
-            <span className="font-bold">Hierarchical Supervisor</span>
-            <span className="text-xs bg-slate-900 px-2 py-1 rounded">Hub & Spoke</span>
+          <div className={`p-2 rounded-lg ${activeScenario.id === 'hierarchical' ? 'bg-blue-500/20 text-blue-400' : 'bg-slate-800 text-slate-500 group-hover:text-slate-300'}`}>
+            <Icon name="GitMerge" size={20} />
           </div>
-          <p className="text-sm opacity-80">Central orchestrator manages delegation. Reduces P2P complexity but creates a bottleneck.</p>
+          <div>
+            <div className="font-bold text-sm">Hierarchical</div>
+            <div className="text-xs opacity-60">Hub & Spoke Delegation</div>
+          </div>
         </button>
 
         <button
           onClick={() => { setActiveScenario(RAIL_HIVE_SCENARIO); setIsPlaying(false); setSimulationStep(-1); }}
-          className={`w-full p-4 rounded-lg border text-left transition-all ${
+          className={`group p-3 rounded-xl border text-left transition-all hover:shadow-md flex items-center gap-3 ${
             activeScenario.id === 'rail_hive' 
-            ? 'bg-emerald-900/20 border-emerald-500 text-emerald-100' 
-            : 'bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-750'
+            ? 'bg-emerald-900/20 border-emerald-500 text-emerald-100 shadow-emerald-900/20' 
+            : 'bg-slate-900 border-slate-800 text-slate-400 hover:bg-slate-800 hover:border-slate-600'
           }`}
         >
-          <div className="flex items-center justify-between mb-2">
-            <span className="font-bold flex items-center gap-2">
-              <Icon name="Train" size={16} />
-              Adhesion War Room
-            </span>
-            <span className="text-xs bg-emerald-900/50 px-2 py-1 rounded text-emerald-200">MAS Demo</span>
+          <div className={`p-2 rounded-lg ${activeScenario.id === 'rail_hive' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-800 text-slate-500 group-hover:text-slate-300'}`}>
+            <Icon name="Train" size={20} />
           </div>
-          <p className="text-sm opacity-80">Station Overrun Incident. 5 Agents negotiate a solution in real-time.</p>
+          <div>
+            <div className="font-bold text-sm">Adhesion War Room</div>
+            <div className="text-xs opacity-60">Live Multi-Agent Demo</div>
+          </div>
         </button>
       </div>
 
-      {/* Visualizer */}
-      <div className="lg:col-span-2 flex flex-col space-y-4">
-        <div className="bg-slate-900 rounded-xl border border-slate-800 p-6 flex-grow flex flex-col">
-          <div className="mb-4 flex justify-between items-start">
-            <div>
-              <h3 className="text-2xl font-bold text-white flex items-center gap-2">
-                {activeScenario.title}
-              </h3>
-              <p className="text-slate-400 mt-1">{activeScenario.description}</p>
+      {/* Main Visualizer Area - Full Width */}
+      <div className="bg-slate-900/50 rounded-2xl border border-slate-800 p-4 md:p-6 flex-grow flex flex-col shadow-2xl">
+        {/* Graph Header */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+          <div>
+            <h3 className="text-2xl font-bold text-white flex items-center gap-3">
+              {activeScenario.title}
+            </h3>
+            <p className="text-slate-400 text-sm mt-1 max-w-2xl">{activeScenario.description}</p>
+          </div>
+          {activeScenario.steps && (
+            <button 
+              onClick={handlePlay}
+              disabled={isPlaying}
+              className={`px-6 py-3 rounded-xl font-bold shadow-lg transition-all flex items-center gap-2 whitespace-nowrap ${
+                isPlaying 
+                ? 'bg-slate-800 text-slate-500 cursor-not-allowed' 
+                : 'bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white hover:shadow-blue-900/30 hover:-translate-y-0.5'
+              }`}
+            >
+              <Icon name={isPlaying ? "Loader2" : "Play"} className={isPlaying ? "animate-spin" : "fill-current"} size={20} />
+              {isPlaying ? "Simulating..." : "Run Simulation"}
+            </button>
+          )}
+        </div>
+        
+        {/* Graph Canvas - Expanded Height */}
+        <div className="flex-grow min-h-[500px] bg-slate-950 rounded-xl border border-slate-800 overflow-hidden relative">
+           <GraphCanvas nodes={activeScenario.nodes} edges={activeScenario.edges} activeNodeId={activeNodeId} />
+        </div>
+        
+        {/* Live Log - Below Canvas */}
+        <div className={`mt-4 p-4 md:p-6 rounded-xl border text-sm font-mono min-h-[120px] transition-all duration-500 ${isPlaying ? styles.bg : 'bg-slate-950/50'} ${isPlaying ? styles.border : 'border-slate-800'}`}>
+          {isPlaying && currentStepDescription ? (
+              <div className="animate-fade-in">
+                <div className="flex items-center gap-3 mb-3">
+                   <span className={`relative flex h-3 w-3`}>
+                      <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${styles.indicator}`}></span>
+                      <span className={`relative inline-flex rounded-full h-3 w-3 ${styles.indicator}`}></span>
+                    </span>
+                    <h4 className={`${styles.text} font-bold uppercase text-xs tracking-widest`}>
+                      Live Agent Log
+                    </h4>
+                </div>
+                <p className="text-white text-base md:text-lg leading-relaxed font-medium">{currentStepDescription}</p>
+              </div>
+          ) : (
+            <div className="h-full flex flex-col justify-center">
+              <h4 className="text-slate-500 font-bold mb-2 uppercase text-xs tracking-widest">Architectural Insights</h4>
+              <div className="text-slate-400 text-sm flex flex-wrap gap-x-6 gap-y-2">
+                {activeScenario.id === 'sequential' && (
+                  <>
+                    <span className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-blue-500"></span>Context Handoff</span>
+                    <span className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-emerald-500"></span>Shared State</span>
+                  </>
+                )}
+                {activeScenario.id === 'hierarchical' && (
+                  <>
+                    <span className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-amber-500"></span>Supervisor Bottleneck</span>
+                    <span className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-slate-500"></span>Delegation Pattern</span>
+                  </>
+                )}
+                {activeScenario.id === 'rail_hive' && (
+                  <>
+                     <span className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-red-500"></span>Safety Gates</span>
+                     <span className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-purple-500"></span>Logic Conflict</span>
+                     <span className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-emerald-500"></span>Asset Constraints</span>
+                  </>
+                )}
+              </div>
             </div>
-            {activeScenario.steps && (
-              <button 
-                onClick={handlePlay}
-                disabled={isPlaying}
-                className={`px-4 py-2 rounded-lg font-bold flex items-center gap-2 ${
-                  isPlaying 
-                  ? 'bg-slate-700 text-slate-400 cursor-not-allowed' 
-                  : 'bg-blue-600 hover:bg-blue-500 text-white'
-                }`}
-              >
-                <Icon name={isPlaying ? "Loader2" : "Play"} className={isPlaying ? "animate-spin" : ""} size={18} />
-                {isPlaying ? "Simulating..." : "Run Simulation"}
-              </button>
-            )}
-          </div>
-          
-          <GraphCanvas nodes={activeScenario.nodes} edges={activeScenario.edges} activeNodeId={activeNodeId} />
-          
-          {/* Simulation Log / Insights */}
-          <div className={`mt-4 p-4 rounded-lg border text-sm font-mono min-h-[120px] transition-colors duration-500 ${isPlaying ? styles.bg : 'bg-slate-950'} ${isPlaying ? styles.border : 'border-slate-800'}`}>
-            {isPlaying && currentStepDescription ? (
-               <div className="animate-pulse-fast">
-                 <h4 className={`${styles.text} font-bold mb-2 uppercase text-xs tracking-wider flex items-center gap-2`}>
-                    <span className={`w-2 h-2 rounded-full ${styles.indicator}`}></span>
-                    Live Agent Log
-                 </h4>
-                 <p className="text-white text-lg leading-relaxed">{currentStepDescription}</p>
-               </div>
-            ) : (
-              <>
-                <h4 className="text-slate-200 font-bold mb-2 uppercase text-xs tracking-wider">Architectural Insights</h4>
-                <ul className="list-disc list-inside space-y-1 text-slate-400">
-                  {activeScenario.id === 'sequential' && (
-                    <>
-                      <li><span className="text-blue-400">Context Handoff:</span> Edges carry the full history.</li>
-                      <li><span className="text-emerald-400">Shared State:</span> The parallel track maintains truth.</li>
-                    </>
-                  )}
-                  {activeScenario.id === 'hierarchical' && (
-                    <>
-                      <li><span className="text-amber-400">Supervisor Bottleneck:</span> Central node handles all token traffic.</li>
-                      <li><span className="text-slate-300">Separation of Concerns:</span> Workers do not communicate directly.</li>
-                    </>
-                  )}
-                  {activeScenario.id === 'rail_hive' && (
-                    <>
-                      <li><span className="text-emerald-400">Conflict Resolution:</span> Observe the Doctor (Green) vs Strategist (Purple) negotiation loop.</li>
-                      <li><span className="text-red-400">Safety Gates:</span> The Guardian (Red) must validate the Strategist's proposal before execution.</li>
-                      <li><span className="text-blue-400">Human-in-the-loop:</span> The system proposes, the human approves.</li>
-                    </>
-                  )}
-                </ul>
-              </>
-            )}
-          </div>
+          )}
         </div>
       </div>
     </div>
